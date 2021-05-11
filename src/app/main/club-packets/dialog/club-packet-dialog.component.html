@@ -1,0 +1,31 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content [formGroup]="form" fxLayoutGap="8px" style="overflow: hidden">
+  <mat-form-field class="col-auto">
+    <input matInput placeholder="Название" formControlName="name" />
+  </mat-form-field>
+  <mat-form-field class="col-auto">
+    <mat-select placeholder="Выберите зал" formControlName="hall" [compareWith]="compareFn" required>
+      <mat-option *ngFor="let hall of halls" [value]="hall">
+        {{ hall.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div fxLayoutGap="8px" class="col-auto" formGroupName="time">
+    <mat-form-field fxFlex="50%">
+      <input matInput type="number" min="0" placeholder="Час" formControlName="hour" required />
+    </mat-form-field>
+    <mat-form-field fxFlex="50%">
+      <input matInput type="number" min="0" max="59" placeholder="Минут" formControlName="minute" required />
+    </mat-form-field>
+  </div>
+  <mat-form-field class="col-auto">
+    <input matInput type="number" placeholder="Цена (KZT)" formControlName="cost" />
+  </mat-form-field>
+  <mat-form-field class="col-auto">
+    <textarea matInput placeholder="Описание" formControlName="description"></textarea>
+  </mat-form-field>
+</div>
+<div style="padding: 20px 0;" mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between center">
+  <button mat-raised-button (click)="onNoClick()">Закрыть</button>
+  <button mat-raised-button color="primary" [mat-dialog-close]="form.value" cdkFocusInitial>Сохранить</button>
+</div>

@@ -1,0 +1,51 @@
+<div fxLayout="row" fxLayoutAlign="space-between center">
+  <h1 mat-dialog-title>{{ title }}</h1>
+  <button mat-icon-button (click)="onNoClick()" aria-label="Закрыть" style="margin-bottom: 20px;">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<div *ngIf="!isChangePassword" mat-dialog-content [formGroup]="form">
+  <div formGroupName="profile">
+    <mat-form-field>
+      <input matInput placeholder="Имя" formControlName="firstName" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Фамилия" formControlName="lastName" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Телефон номер" formControlName="phoneNumber" />
+    </mat-form-field>
+  </div>
+  <mat-form-field>
+    <input matInput type="email" placeholder="Email" formControlName="email" readonly />
+  </mat-form-field>
+</div>
+<div *ngIf="isChangePassword" [formGroup]="passForm" mat-dialog-content>
+  <div>
+    <mat-form-field>
+      <input matInput type="password" placeholder="Текущий пароль" formControlName="currentPass" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="password" placeholder="Новый пароль" formControlName="newPass" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="password" placeholder="Подвердите новый пароль" formControlName="confNewPass" />
+    </mat-form-field>
+  </div>
+</div>
+<div style="padding: 20px 0;" mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between center">
+  <button *ngIf="!isChangePassword" mat-raised-button (click)="onOpenPassView()">Изменить пароль</button>
+  <button *ngIf="!isChangePassword" mat-raised-button color="primary" (click)="onSave()" cdkFocusInitial>Сохранить</button>
+
+  <button
+    *ngIf="isChangePassword"
+    [disabled]="passForm.invalid || passForm.controls['confNewPass'].hasError('NoPassswordMatch')"
+    mat-raised-button
+    color="primary"
+    (click)="onChangePass()"
+    fxLayoutAlign="end"
+    cdkFocusInitial
+  >
+    Сменить пароль
+  </button>
+</div>

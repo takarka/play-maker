@@ -1,0 +1,7 @@
+<div [class.loader-hidden]="!show">
+  <div class="loader-overlay">
+    <div>
+      <mat-progress-bar *ngIf="show" mode="indeterminate"></mat-progress-bar>
+    </div>
+  </div>
+</div>

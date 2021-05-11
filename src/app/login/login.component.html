@@ -1,0 +1,41 @@
+<div class="login-page">
+    <div class="content"  fxFlex="100%" fxFlex.gt-sm="50%">
+        <!-- <h1 class="app-name">Sb Admin Material</h1> -->
+        <form class="login-form" fxFlex [formGroup]="loginForm" >
+            <div class="text-center">
+                <!-- <h2 class="app-name">Play Maker</h2> -->
+                <img class="app-name" style="width: 100px; height: 50px; vertical-align: top;" src="../../assets/images/logo/incon logo.png" />
+            </div>
+            <div fxFlex  fxlayout="row" fxlayout.lt-md="column">
+                <div fxFlexFill>
+                    <mat-form-field class="w-100">
+                        <input matInput type="email" placeholder="Логин" formControlName="email">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div fxFlex  fxLayout="row" fxLayout.lt-md="column">
+                <div fxFlexFill>
+                    <mat-form-field class="w-100">
+                        <input matInput type="password" placeholder="Пароль" formControlName="password">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div fxFlex  fxLayout="row" fxLayout.lt-md="column" style="margin: 20px 0 30px 0">
+                <div fxFlex>
+                    <mat-checkbox color="primary">Запомнить</mat-checkbox>
+                </div>
+                <div fxFlex  fxLayoutAlign="end">
+                    <a href="javascript:void(0)">Забыли пароль?</a>
+                </div>
+            </div>
+            <div fxFlex  fxLayout="row" fxLayout.lt-md="column">
+                <div fxFlexFill>
+                    <button mat-raised-button color="primary" class="w-100" (click)="onLogin()" [disabled]="loginForm.invalid">
+                        Войти
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content [formGroup]="form">
+  <mat-form-field *ngIf="isSuperAdmin">
+    <mat-select placeholder="Выберите организацию" formControlName="tenantId" [compareWith]="compareFn" required>
+      <mat-option *ngFor="let tenant of tenants" [value]="tenant.id">
+        {{ tenant.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div formGroupName="profile">
+    <mat-form-field>
+      <input matInput placeholder="Имя" formControlName="firstName" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Фамилия" formControlName="lastName" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Телефон номер" formControlName="phoneNumber" />
+    </mat-form-field>
+  </div>
+  <mat-form-field>
+    <input matInput type="email" placeholder="Email" formControlName="email" />
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput placeholder="Пароль" formControlName="password" />
+  </mat-form-field>
+</div>
+<div style="padding: 20px 0;" mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between center">
+  <button mat-raised-button (click)="onNoClick()">Закрыть</button>
+  <button mat-raised-button color="primary" (click)="onSave()" cdkFocusInitial>Сохранить</button>
+</div>

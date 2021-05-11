@@ -1,0 +1,27 @@
+.mat-form-field {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+}
+
+td,
+th {
+  width: 10%;
+  padding-right: 8px
+}
+
+.successfull {
+  color: hotpink;
+  text-align: center;
+  background: green;
+}
+
+tr.mat-footer-row {
+  font-weight: bold;
+}
+
+.mat-table-sticky {
+  border-top: 1px solid #e0e0e0;
+}

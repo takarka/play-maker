@@ -1,0 +1,49 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content [formGroup]="form" fxLayoutGap="8px" style="overflow: hidden">
+  <mat-form-field class="col-auto">
+    <input matInput placeholder="Название" formControlName="name" [readonly]="isPrimary" />
+  </mat-form-field>
+  <mat-form-field class="col-auto">
+    <mat-select
+      [disabled]="isPrimary"
+      (selectionChange)="hallSelected($event)"
+      placeholder="Выберите зал"
+      formControlName="hall"
+      [compareWith]="compareFn"
+      required
+    >
+      <mat-option *ngFor="let hall of halls" [value]="hall">
+        {{ hall.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <!-- <mat-radio-group
+    *ngIf="isPrimary"
+    style="padding-bottom: 10px"
+    fxLayout="row"
+    fxLayoutGap="8px"
+    class="col-auto"
+    formControlName="primaryType"
+    (change)="onChange($event)"
+  >
+    <div fxFlex fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+      <mat-radio-button fxFlex="50%" [value]="Primary_Type.DAY">День</mat-radio-button>
+      <mat-radio-button fxFlex="50%" [value]="Primary_Type.NIGHT">Ночь</mat-radio-button>
+    </div>
+  </mat-radio-group> -->
+  <div fxLayoutGap="8px" class="col-auto" formGroupName="time">
+    <mat-form-field fxFlex="50%">
+      <input matInput type="number" min="0" placeholder="Час" formControlName="hour" [readonly]="isPrimary" required />
+    </mat-form-field>
+    <mat-form-field fxFlex="50%">
+      <input matInput type="number" min="0" max="59" placeholder="Минут" formControlName="minute" [readonly]="isPrimary" required />
+    </mat-form-field>
+  </div>
+  <mat-form-field class="col-auto">
+    <input matInput type="number" placeholder="Цена (KZT)" formControlName="cost" />
+  </mat-form-field>
+</div>
+<div style="padding: 20px 0;" mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between center">
+  <button mat-raised-button (click)="onNoClick()">Закрыть</button>
+  <button mat-raised-button color="primary" [disabled]="!form.valid" (click)="onSaveClick()">Сохранить</button>
+</div>

@@ -1,0 +1,7 @@
+// export * from '../../main/main.module'
+// export * from '../../main/club/club.module'
+// export * from '../../main/halls/hall.module'
+// export * from '../../main/places/place.module'
+// export * from '../../main/operators/operator.module'
+// export * from '../../main/tarifs/tarif.module'
+// export * from '../../main/club-packets/club-packet.module'

@@ -1,0 +1,148 @@
+<h1 mat-dialog-title style="text-align: center">{{ title }}</h1>
+<mat-tab-group mat-stretch-tabs style="max-width: 402px;" (selectedIndexChange)="tabLabelChanged($event)">
+  <mat-tab label="Инфо">
+    <div
+      mat-dialog-content
+      fxLayout="column"
+      [formGroup]="form"
+      fxLayoutGap="8px"
+      style="padding-top: 10px; overflow: auto; margin: 0 auto;"
+    >
+      <mat-form-field class="col-auto">
+        <mat-select
+          (selectionChange)="placeSelected($event)"
+          [disabled]="isOrderClosed"
+          placeholder="Выберите место"
+          formControlName="place"
+          [compareWith]="compareFn"
+          required
+        >
+          <mat-option *ngFor="let place of places" [value]="place" [disabled]="!place.isFree">
+            {{ place.name + ' - ' + place.hall.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div *ngIf="!isLastDetailOpenTime">
+        <mat-radio-group
+          [disabled]="selectedPlace == null"
+          style="padding-bottom: 10px"
+          fxLayout="row"
+          fxLayoutGap="8px"
+          class="col-auto"
+          (change)="onChange($event)"
+        >
+          <div fxLayout="column" fxLayoutGap="8px" fxLayoutAlign="space-between start">
+            <mat-radio-button [value]="OPENTIME" [disabled]="!hasPrimaryTarif">Открытое время</mat-radio-button>
+            <mat-radio-button [value]="AMOUNT" [disabled]="!hasPrimaryTarif">Произв. оплата</mat-radio-button>
+          </div>
+          <div fxLayout="column" fxLayoutGap="8px" fxLayoutAlign="space-between start">
+            <mat-radio-button [value]="TARIF" checked>Тариф</mat-radio-button>
+            <mat-radio-button [value]="PACKET">Пакет</mat-radio-button>
+          </div>
+        </mat-radio-group>
+        <!-- Tarif START-->
+        <mat-form-field class="col-auto" *ngIf="selectedOptionType === TARIF">
+          <mat-select
+            (selectionChange)="tarifSelected($event.value)"
+            placeholder="Выберите тариф"
+            formControlName="tarif"
+            [compareWith]="compareFn"
+          >
+            <mat-option *ngFor="let tarif of tarifs" [value]="tarif">
+              {{ tarif.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- Tarif END-->
+        <!-- Packet START-->
+        <mat-form-field class="col-auto" *ngIf="selectedOptionType === PACKET">
+          <mat-select
+            (selectionChange)="packetSelected($event.value)"
+            placeholder="Выберите пакет"
+            formControlName="packet"
+            [compareWith]="compareFn"
+          >
+            <mat-option *ngFor="let packet of packets" [value]="packet">
+              {{ packet.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- Packet END-->
+        <!-- Amount START-->
+        <mat-form-field class="col-auto" *ngIf="selectedOptionType === AMOUNT">
+          <input matInput type="number" (keyup)="amountChanged($event)" placeholder="Цена (KZT)" formControlName="amount" />
+        </mat-form-field>
+      </div>
+      <!-- Amount END-->
+      <!-- Time and Cost START-->
+      <div fxLayoutGap="8px" class="col-auto" formGroupName="time" *ngIf="selectedOptionType !== OPENTIME && !isLastDetailOpenTime">
+        <mat-form-field fxFlex="50%">
+          <input matInput type="number" placeholder="Час" formControlName="hour" readonly />
+        </mat-form-field>
+        <mat-form-field fxFlex="50%">
+          <input matInput type="number" placeholder="Минут" formControlName="minute" readonly />
+        </mat-form-field>
+      </div>
+      <mat-form-field class="col-auto" *ngIf="selectedOptionType !== OPENTIME  && !isLastDetailOpenTime">
+        <input matInput placeholder="Цена (KZT)" formControlName="cost" readonly />
+      </mat-form-field>
+      <!-- Time and Cost END-->
+      <!-- OpenTime START-->
+      <mat-form-field class="col-auto" formGroupName="openTime" *ngIf="selectedOptionType === OPENTIME">
+        <input matInput type="text" placeholder="За 1 час" formControlName="description" readonly />
+      </mat-form-field>
+      <!-- OpenTime END-->
+    </div>
+  </mat-tab>
+  <mat-tab label="Подробно" [disabled]="viewState === NEW">
+    <div class="mat-elevation-z8" style="padding-top: 10px; padding-bottom: 10px; max-height: 340px; overflow: auto;">
+      <div fxLayout="row" fxLayoutGap="8px" class="col-auto">
+        <mat-form-field>
+          <input matInput type="text" placeholder="Создал" [(ngModel)]="createdByFullName" readonly />
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text" placeholder="Зал" [(ngModel)]="hallName" readonly />
+        </mat-form-field>
+      </div>
+      <table mat-table [dataSource]="dataSource">
+        <!-- ID Column -->
+        <ng-container matColumnDef="dateTime">
+          <th mat-header-cell *matHeaderCellDef>Время</th>
+          <td mat-cell *matCellDef="let row; let i = index">{{ row.dateTime | date: 'dd:MM:yy HH:mm' }}</td>
+          <td mat-footer-cell *matFooterCellDef>Итог:</td>
+        </ng-container>
+
+        <!-- Hall Name Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Тип</th>
+          <td mat-cell *matCellDef="let row">{{ row.type }}</td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+
+        <!-- Hall Name Column -->
+        <ng-container matColumnDef="data">
+          <th mat-header-cell *matHeaderCellDef>На</th>
+          <td mat-cell *matCellDef="let row">
+            {{ getDataInfo(row) }}
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+  </mat-tab>
+</mat-tab-group>
+<div style="padding: 20px 0;" mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between center">
+  <button mat-raised-button (click)="onNoClick()">Закрыть</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!form.valid || !form.dirty || selectedPlace == null || secondTabSelected"
+    *ngIf="!isOrderClosed"
+    (click)="onOkClick()"
+  >
+    {{ okButtonTitle }}
+  </button>
+</div>

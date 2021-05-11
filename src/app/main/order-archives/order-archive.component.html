@@ -1,0 +1,134 @@
+<div flex fxLayout="column">
+  <div flex fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="8px" *ngIf="autenticatedUserRole !== OPERATOR">
+    <div fxLayout="column" fxLayoutGap="8px" fxFlex="50%">
+      <mat-form-field>
+        <mat-select placeholder="Зал" [(ngModel)]="searchDTO.hall" [compareWith]="compareFn" (selectionChange)="hallSelected($event.value)">
+          <mat-option>Все</mat-option>
+          <mat-option *ngFor="let hall of halls" [value]="hall">
+            {{ hall.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select placeholder="Создал(а)" [(ngModel)]="searchDTO.openedBy" [compareWith]="compareFn">
+          <mat-option>Все</mat-option>
+          <mat-option *ngFor="let user of users" [value]="user">
+            {{ getUserName(user) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayoutGap="8px" fxFlex="50%">
+      <mat-form-field>
+        <input
+          matInput
+          #input
+          [matDatepicker]="picker1"
+          placeholder="Дата начало"
+          (focus)="picker1.open()"
+          [(ngModel)]="searchDTO.startDate"
+          readonly
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1 (closed)="input.blur()"></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <input
+          matInput
+          #input
+          [matDatepicker]="picker2"
+          placeholder="Дата окончание"
+          (focus)="picker2.open()"
+          [(ngModel)]="searchDTO.endDate"
+          readonly
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2 (closed)="input.blur()"></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div fxLayout="column" fxLayoutGap="8px" fxFlex="20%" fxLayoutAlign="space-around center">
+      <button style="height: 40px; width: 120px; text-align: center;" mat-raised-button color="primary" (click)="doSearch()">
+        Найти<mat-icon fxHide fxShow.gt-xs class="sidenav-icon">search</mat-icon>
+      </button>
+      <button style="height: 40px; width: 120px; text-align: center;" mat-raised-button color="primary" (click)="doReset()">
+        Сброс<mat-icon fxHide fxShow.gt-xs class="sidenav-icon">replay</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div flex fxLayout="column" class="mat-elevation-z8" #TABLE>
+    <table mat-table [dataSource]="dataSource" matSort matSortActive="time" matSortDirection="asc">
+      <!-- ID Column -->
+      <ng-container matColumnDef="No">
+        <th mat-header-cell *matHeaderCellDef>No</th>
+        <td mat-cell *matCellDef="let row; let i = index">{{ i + paginator.pageIndex * paginator.pageSize + 1 }}</td>
+        <td mat-footer-cell *matFooterCellDef>Итог:</td>
+      </ng-container>
+
+      <!-- Opened Date Name Column -->
+      <ng-container matColumnDef="openedDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Открыто</th>
+        <td mat-cell *matCellDef="let row">{{ row.openedDate ? (row.openedDate | date: 'dd/MM/yyyy') : '' }}</td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Hall Name Column -->
+      <ng-container matColumnDef="hall">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Зал</th>
+        <td mat-cell *matCellDef="let row">{{ row.activePlace ? row.activePlace.hall.name : '' }}</td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Opened By Name Column -->
+      <ng-container matColumnDef="openedBy">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Создан</th>
+        <td mat-cell *matCellDef="let row">{{ getOpenedByName(row) }}</td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Time Column -->
+      <ng-container matColumnDef="time">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Время</th>
+        <td mat-cell *matCellDef="let row">
+          <countdown
+            *ngIf="row.duration"
+            [config]="{ leftTime: row.duration.totalDuration, demand: true, template: '$!h!:$!m!:$!s!' }"
+          ></countdown>
+        </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Cost Column -->
+      <ng-container matColumnDef="cost">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="cost">Цена (KZT)</th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.cost ? row.cost.totalCost : '' }}
+        </td>
+        <td mat-footer-cell *matFooterCellDef>{{ getTotalCost() }} KZT</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef style="width: 15%"></th>
+        <td fxLayoutGap="8px" mat-cell *matCellDef="let row" [style.color]="row.address" style="width: 15%">
+          <button mat-raised-button color="primary" (click)="doDetail(row)">
+            <mat-icon class="sidenav-icon">list_alt</mat-icon>
+          </button>
+          <button *ngIf="autenticatedUserRole !== OPERATOR" mat-raised-button color="warn" (click)="doDelete(row)">
+            <mat-icon class="sidenav-icon">delete</mat-icon>
+          </button>
+        </td>
+        <td mat-footer-cell *matFooterCellDef>
+          <button mat-icon-button color="primary" matTooltip="Экспорт в Excel" (click)="exportAsXLSX()">
+            Экспорт в Excel
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+    </table>
+
+    <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+  </div>
+</div>
