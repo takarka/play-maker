@@ -6,7 +6,7 @@ Admin App built using Angular 7 and Material 2.
 
 Provides fast, reliable and extensible starter for the development of Angular projects.
 
-`sb-admin-material` provides the following features:
+Project provides the following features:
 
 - Developed using Material-v2.0.0
 - angular-v7.1.0
